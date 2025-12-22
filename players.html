@@ -1,14 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>LIVE INSTANCES | Paradox HQ</title>
+    <style>
+        :root { --neon: #ff4500; --dark: #080808; --glass: rgba(255, 255, 255, 0.05); }
+        body { background: var(--dark); color: white; font-family: 'Orbitron', sans-serif; display: flex; margin: 0; }
+        .sidebar { width: 280px; background: rgba(255,255,255,0.02); height: 100vh; border-right: 1px solid var(--neon); padding: 30px; position: fixed; }
+        .main-content { margin-left: 320px; padding: 50px; width: 100%; }
+        .neon-text { color: var(--neon); text-shadow: 0 0 15px var(--neon); }
+        
+        table { width: 100%; border-collapse: collapse; background: var(--glass); border-radius: 15px; overflow: hidden; }
+        th { background: rgba(255, 69, 0, 0.2); color: var(--neon); padding: 20px; text-align: left; text-transform: uppercase; letter-spacing: 2px; }
+        td { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        tr:hover { background: rgba(255, 255, 255, 0.03); }
+        
+        .status-online { color: #00ff00; font-weight: bold; text-shadow: 0 0 5px #00ff00; }
+        .action-btn { background: transparent; border: 1px solid #ff0000; color: #ff0000; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        .action-btn:hover { background: #ff0000; color: white; box-shadow: 0 0 15px #ff0000; }
+    </style>
 </head>
-<body class="dashboard-body">
-    <div class="content">
-        <h1>LIVE INSTANCES</h1>
-        <table class="secure-table">
-            <tr><th>UUID</th><th>POSITION</th><th>STATUS</th></tr>
-            <tr><td>#IGNIS_MAIN</td><td>X:12, Y:4</td><td>STABLE</td></tr>
+<body>
+    <div class="sidebar">
+        <h2 class="neon-text">PARADOX<span>HQ</span></h2>
+        <nav style="margin-top: 50px;">
+            <a href="dashboard.html" style="color: #888; text-decoration: none; display: block; margin: 20px 0;">🏠 DASHBOARD</a>
+            <a href="players.html" style="color: var(--neon); text-decoration: none; display: block; margin: 20px 0;">👤 LIVE NODES</a>
+            <a href="settings.html" style="color: #888; text-decoration: none; display: block; margin: 20px 0;">⚙️ KERNEL</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <h1 class="neon-text">ACTIVE PLAYER NODES</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>UUID</th>
+                    <th>DEVICE</th>
+                    <th>PING</th>
+                    <th>STATUS</th>
+                    <th>COMMAND</th>
+                </tr>
+            </thead>
+            <tbody id="player-list">
+                <tr>
+                    <td>#823_IGNIS</td>
+                    <td>Android/Linux</td>
+                    <td>24ms</td>
+                    <td><span class="status-online">IN-GAME</span></td>
+                    <td><button class="action-btn">KICK</button></td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </body>
