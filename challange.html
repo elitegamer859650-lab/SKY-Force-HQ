@@ -1,29 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script>
-        if(!document.cookie.includes("p_fingerprint")) window.location.href = "index.html";
-    </script>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>SECURITY CHECK | Paradox HQ</title>
+    <style>
+        :root { --neon: #ff4500; --bg: #050505; --glass: rgba(255, 255, 255, 0.05); }
+        body { 
+            background: var(--bg); color: #e0e0e0; font-family: 'Orbitron', sans-serif;
+            display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;
+            background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
+        }
+        .vault-container {
+            background: var(--glass); backdrop-filter: blur(20px);
+            padding: 60px; border-radius: 30px; border: 1px solid rgba(255, 69, 0, 0.3);
+            text-align: center; width: 450px; box-shadow: 0 0 100px rgba(255, 69, 0, 0.1);
+        }
+        .neon-text { color: var(--neon); text-shadow: 0 0 15px var(--neon); letter-spacing: 3px; }
+        input {
+            background: rgba(0,0,0,0.5); border: 1px solid #333; color: white;
+            padding: 15px; width: 90%; border-radius: 10px; margin: 25px 0;
+            text-align: center; font-size: 1.1rem; border-bottom: 2px solid var(--neon);
+        }
+        .neon-btn {
+            background: transparent; border: 2px solid var(--neon); color: var(--neon);
+            padding: 15px 50px; cursor: pointer; border-radius: 50px; font-weight: bold;
+            transition: 0.4s; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .neon-btn:hover { background: var(--neon); color: white; box-shadow: 0 0 40px var(--neon); }
+    </style>
 </head>
-<body class="secure-bg">
-    <div class="glass-box">
-        <h2 id="q-title">OWNERSHIP TEST</h2>
-        <p id="q-text">Aapki pehli coding language konsi thi?</p>
-        <input type="text" id="ans" class="secure-input">
-        <button onclick="check_step_1()" class="btn-glow">SUBMIT DATA</button>
+<body>
+    <div class="vault-container">
+        <h2 class="neon-text">LOCATION VERIFICATION</h2>
+        <p style="color: #666;">BIOMETRIC SCAN COMPLETE. ENTER RESIDENCE TOKEN.</p>
+        <p>Where do you live?</p>
+        <input type="password" id="secureAns" placeholder="••••••••••••">
+        <button onclick="p_verify()" class="neon-btn">DECRYPT ACCESS</button>
     </div>
 
     <script>
-        function check_step_1() {
-            const a = document.getElementById('ans').value.toLowerCase();
-            if(a === "html") { // Apna sahi jawab yahan likho
-                window.location.href = "dashboard.html";
+        // Security logic - Answer is Hidden in Base64
+        // 'bWlyYW5hYmFk' is 'miranabad'
+        function p_verify() {
+            const input = document.getElementById('secureAns').value.toLowerCase().trim();
+            if (btoa(input) === "bWlyYW5hYmFk") { 
+                document.cookie = "p_auth=granted; max-age=3600; path=/";
+                window.location.href = "dashboard.html"; 
             } else {
-                alert("ACCESS DENIED.");
-                location.reload();
+                alert("ACCESS DENIED: INTRUDER ALERT.");
+                location.href = "index.html";
             }
         }
+        // Disable Right Click & F12 to stop Inspect
+        document.onkeydown = (e) => { if(e.keyCode == 123) return false; };
+        document.addEventListener('contextmenu', event => event.preventDefault());
     </script>
 </body>
 </html>
