@@ -2,48 +2,60 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DASHBOARD | Paradox Command</title>
+    <title>DASHBOARD | Paradox HQ</title>
     <style>
-        /* Modern UI Style */
-        :root { --neon: #ff4500; --dark: #080808; }
-        body { background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; display: flex; margin: 0; }
-        .sidebar { width: 300px; background: rgba(255,255,255,0.02); height: 100vh; border-right: 1px solid var(--neon); padding: 30px; }
-        .main-view { flex: 1; padding: 50px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
-        .stat-card { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border-left: 5px solid var(--neon); }
-        .live-log { background: black; padding: 20px; border-radius: 10px; height: 200px; overflow-y: scroll; font-family: monospace; color: #0f0; margin-top: 30px; border: 1px solid #222; }
+        :root { --neon: #ff4500; --bg: #050505; --glass: rgba(255, 255, 255, 0.05); }
+        body { background: var(--bg); color: white; font-family: 'Orbitron', sans-serif; margin: 0; display: flex; }
+        .sidebar { width: 250px; height: 100vh; background: rgba(255,255,255,0.02); border-right: 1px solid var(--neon); padding: 20px; }
+        .main { flex: 1; padding: 40px; }
+        .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+        .match-card { background: var(--glass); padding: 30px; border-radius: 15px; border-left: 5px solid var(--neon); text-align: center; }
+        .neon-text { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
+        .status { font-size: 0.8rem; color: #0f0; letter-spacing: 2px; }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <h2 style="color:var(--neon)">PARADOX<span>HQ</span></h2>
-        <p>ID: #OWNER_001</p>
-        <hr style="border: 0.1px solid #222">
-        <button class="neon-btn" onclick="location.href='players.html'" style="width:100%; padding:10px; margin:10px 0; background:transparent; border:1px solid var(--neon); color:white;">LIVE PLAYERS</button>
-        <button class="neon-btn" onclick="location.href='settings.html'" style="width:100%; padding:10px; margin:10px 0; background:transparent; border:1px solid var(--neon); color:white;">KERNEL SETTINGS</button>
+        <h2 class="neon-text">PARADOX<span>HQ</span></h2>
+        <p>SYSTEM: ONLINE 🟢</p>
+        <hr style="border:0.1px solid #333">
+        <p style="font-size: 12px; color: #666;">OWNER: 2-CORE / 4GB RAM</p>
     </div>
 
-    <div class="main-view">
-        <h1 class="neon-text">SYSTEM OPERATIONAL</h1>
-        <div class="stats-grid">
-            <div class="stat-card"><h3>SOCKET STATUS</h3><p id="s-status">CONNECTING...</p></div>
-            <div class="stat-card"><h3>ACTIVE NODES</h3><p id="p-count">0</p></div>
-            <div class="stat-card"><h3>PING</h3><p>14ms</p></div>
+    <div class="main">
+        <h1>LIVE SERVER MONITOR</h1>
+        <div id="s-status" class="status">CONNECTING TO CLOUD...</div>
+
+        <div class="match-grid">
+            <div class="match-card">
+                <h3 class="neon-text">MATCH 01</h3>
+                <p>Status: Active</p>
+                <h2 id="m1-count">0 / 30</h2>
+            </div>
+            <div class="match-card">
+                <h3 class="neon-text">MATCH 02</h3>
+                <p>Status: Active</p>
+                <h2 id="m2-count">0 / 30</h2>
+            </div>
         </div>
-        <h3>REAL-TIME SERVER LOGS:</h3>
-        <div class="live-log" id="logs"> > Initializing Secure Bridge...<br> > Hardware Match: 12k Laptop...<br> > Mirroring Data from Glitch...</div>
     </div>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
-        // Server Connection Logic
-        const socket = io("https://your-glitch-server.glitch.me");
+        // YAHAN APNA HUGGING FACE URL DALO
+        const socket = io("https://elitegamer859650-paradox-server-hq.hf.space");
+
         socket.on("connect", () => {
-            document.getElementById('s-status').innerText = "ONLINE 🟢";
-            document.getElementById('logs').innerHTML += "<br>> Connection Established Successfully.";
+            document.getElementById('s-status').innerText = "CLOUD SERVER CONNECTED 🟢";
         });
-        socket.on("playerUpdate", (count) => {
-            document.getElementById('p-count').innerText = count;
+
+        // Live Player Updates
+        socket.on("joined", (data) => {
+            if(data.match === "match_1") {
+                document.getElementById('m1-count').innerText = data.count + " / 30";
+            } else if(data.match === "match_2") {
+                document.getElementById('m2-count').innerText = data.count + " / 30";
+            }
         });
     </script>
 </body>
