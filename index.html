@@ -3,36 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <title>GATEWAY | Paradox HQ</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root { --neon: #ff4500; --bg: #050505; }
+        body { 
+            background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif;
+            display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;
+            overflow: hidden;
+        }
+        .glass-box {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px); padding: 50px; border-radius: 20px;
+            border: 1px solid rgba(255, 69, 0, 0.2); text-align: center;
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+        }
+        h2 { letter-spacing: 5px; color: var(--neon); text-shadow: 0 0 10px var(--neon); }
+        p { color: #888; font-size: 0.9rem; }
+        .btn-glow {
+            background: transparent; border: 1px solid var(--neon); color: var(--neon);
+            padding: 15px 40px; cursor: pointer; border-radius: 5px; transition: 0.5s;
+            font-weight: bold; margin-top: 20px; letter-spacing: 2px;
+        }
+        .btn-glow:hover { background: var(--neon); color: white; box-shadow: 0 0 30px var(--neon); }
+    </style>
 </head>
-<body class="secure-bg">
+<body>
     <div class="glass-box">
-        <h2 class="neon-red">IDENTITY HANDSHAKE</h2>
-        <p>Scanning Hardware DNA...</p>
+        <h2>IDENTITY HANDSHAKE</h2>
+        <p>Scanning Hardware DNA: <span id="dna-status">READY</span></p>
         <button onclick="verify_owner()" class="btn-glow">ACCESS KERNEL</button>
     </div>
 
     <script>
         function verify_owner() {
-            // Aapki device ka exclusive data
+            // AAPKA REAL DATA (Screenshot se)
             const MASTER = {
                 cores: 2,
                 ram: 4,
-                screen: "1366x768"
+                width: 1366,
+                height: 768
             };
 
             const currentCores = navigator.hardwareConcurrency;
             const currentRam = navigator.deviceMemory;
-            const currentScreen = window.screen.width + "x" + window.screen.height;
+            const screenW = window.screen.width;
+            const screenH = window.screen.height;
 
-            // Strict Validation
-            if(currentCores === MASTER.cores && currentRam === MASTER.ram && currentScreen === MASTER.screen) {
-                // Real Cookie Set Karo (Security Layer)
-                document.cookie = "p_token=verified_owner; max-age=3600; path=/; SameSite=Strict";
+            console.log("Detecting: ", currentCores, currentRam, screenW, screenH);
+
+            // Validation logic fix
+            if(currentCores === MASTER.cores && currentRam === MASTER.ram) {
+                // Cookie set karna zaroori hai warna challenge.html wapas bhej dega
+                document.cookie = "p_fingerprint=verified; max-age=86400; path=/";
                 window.location.href = "challenge.html"; 
             } else {
-                alert("CRITICAL SECURITY BREACH: UNAUTHORIZED DEVICE DETECTED.");
-                document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%;'>SYSTEM PERMANENTLY LOCKED.</h1>";
+                alert("ACCESS DENIED: DEVICE MISMATCH.");
             }
         }
     </script>
