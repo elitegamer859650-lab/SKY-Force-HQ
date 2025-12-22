@@ -1,14 +1,69 @@
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script>
-    const socket = io("https://elitegamer859650-paradox-server-hq.hf.space");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>KERNEL SETTINGS | Paradox HQ</title>
+    <style>
+        :root { --neon: #ff4500; --bg: #050505; --glass: rgba(255, 255, 255, 0.05); }
+        body { 
+            background: var(--bg); color: white; font-family: 'Orbitron', sans-serif; 
+            margin: 0; display: flex; 
+        }
+        .sidebar { width: 250px; height: 100vh; background: rgba(255,255,255,0.02); border-right: 1px solid var(--neon); padding: 20px; }
+        .main { flex: 1; padding: 40px; }
+        .card { background: var(--glass); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,69,0,0.1); margin-top: 20px; }
+        .neon-text { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
+        input[type=range] { width: 100%; accent-color: var(--neon); cursor: pointer; margin: 20px 0; }
+        .btn { 
+            background: transparent; border: 2px solid var(--neon); color: var(--neon); 
+            padding: 15px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.4s;
+        }
+        .btn:hover { background: var(--neon); color: white; box-shadow: 0 0 30px var(--neon); }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 class="neon-text">PARADOX<span>HQ</span></h2>
+        <nav>
+            <p onclick="location.href='dashboard.html'" style="cursor:pointer; color:#888;">🏠 DASHBOARD</p>
+            <p style="color:var(--neon);">⚙️ SETTINGS</p>
+        </nav>
+    </div>
 
-    function syncChanges() {
-        const config = {
-            gravity: document.getElementById('grav-val').innerText,
-            speed: 20
-        };
-        // Server ko command bhejo
-        socket.emit("updateConfig", config);
-        alert("🚀 Settings Synced to Cloud!");
-    }
-</script>
+    <div class="main">
+        <h1 class="neon-text">KERNEL CONTROL PANEL</h1>
+        <p style="color:#666;">Matchmaking: 30 Players per Room</p>
+
+        <div class="card">
+            <h3>🌍 WORLD GRAVITY</h3>
+            <p>Current: <span id="grav-val">-9.8</span></p>
+            <input type="range" min="-20" max="0" step="0.1" value="-9.8" oninput="document.getElementById('grav-val').innerText=this.value">
+            
+            <button class="btn" onclick="syncChanges()">SYNC TO CLOUD SERVER</button>
+        </div>
+
+        <div class="card" style="border-color: #ff0000; margin-top: 40px;">
+            <h3 style="color: #ff0000;">⚠️ EMERGENCY</h3>
+            <button class="btn" style="border-color:#ff0000; color:#ff0000;" onclick="triggerKill()">KILL ALL SESSIONS</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        // Hugging Face Link Update
+        const socket = io("https://elitegamer859650-paradox-server-hq.hf.space");
+
+        function syncChanges() {
+            const val = document.getElementById('grav-val').innerText;
+            socket.emit("updateConfig", { gravity: val });
+            alert("🚀 Gravity Updated on Cloud!");
+        }
+
+        function triggerKill() {
+            if(confirm("Bhai, sab ko disconnect kar doon?")) {
+                socket.emit("emergencyShutdown");
+            }
+        }
+    </script>
+</body>
+</html>
