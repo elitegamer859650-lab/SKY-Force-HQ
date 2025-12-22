@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        if(!document.cookie.includes("p_fingerprint")) window.location.href = "index.html";
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+    <div class="sidebar">
+        <h3>PARADOX HQ</h3>
+        <a href="dashboard.html" class="active">DASHBOARD</a>
+        <a href="players.html">LIVE NODES</a>
+        <a href="settings.html">KERNEL</a>
+        <a href="#" onclick="logout()">TERMINATE</a>
+    </div>
+    <div class="content">
+        <h1>SYSTEM STABLE: OWNER VERIFIED</h1>
+        <div class="grid">
+            <div class="card"><h4>ACTIVE USERS</h4><p>1</p></div>
+            <div class="card"><h4>SERVER LOAD</h4><p>12%</p></div>
+        </div>
+    </div>
+    <script>function logout(){ document.cookie="p_fingerprint=;max-age=0"; location.reload(); }</script>
+</body>
+</html>
