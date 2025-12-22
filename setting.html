@@ -1,16 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>KERNEL CONTROL | Paradox HQ</title>
+    <style>
+        :root { --neon: #ff4500; --dark: #080808; --glass: rgba(255, 255, 255, 0.05); }
+        body { background: var(--dark); color: white; font-family: 'Orbitron', sans-serif; display: flex; margin: 0; }
+        .main-content { margin-left: 320px; padding: 50px; width: 100%; }
+        
+        .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px; }
+        .control-card { background: var(--glass); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,69,0,0.1); }
+        
+        input[type=range] { width: 100%; accent-color: var(--neon); height: 10px; border-radius: 5px; margin: 20px 0; cursor: pointer; }
+        
+        .neon-btn-full { 
+            background: transparent; border: 2px solid var(--neon); color: var(--neon); width: 100%; 
+            padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.4s; margin-top: 20px;
+        }
+        .neon-btn-full:hover { background: var(--neon); color: white; box-shadow: 0 0 30px var(--neon); }
+        
+        .kill-switch { border-color: #ff0000; color: #ff0000; margin-top: 40px; }
+        .kill-switch:hover { background: #ff0000; box-shadow: 0 0 30px #ff0000; }
+    </style>
 </head>
-<body class="dashboard-body">
-    <div class="content">
-        <h1>SYSTEM KERNEL</h1>
-        <div class="control-group">
-            <label>GLOBAL SPEED</label>
-            <input type="range" min="1" max="10" value="4">
-            <button class="btn-glow">SYNC TO SERVER</button>
+<body>
+    <div class="main-content">
+        <h1 class="neon-text">SYSTEM KERNEL SETTINGS</h1>
+        
+        <div class="control-grid">
+            <div class="control-card">
+                <h3>🌍 WORLD PHYSICS</h3>
+                <label>GLOBAL GRAVITY: <span id="grav-val">-9.8</span></p>
+                <input type="range" min="-20" max="0" step="0.1" oninput="document.getElementById('grav-val').innerText=this.value">
+                
+                <label>TIME SCALE: <span id="time-val">1.0</span></p>
+                <input type="range" min="0" max="5" step="0.1" oninput="document.getElementById('time-val').innerText=this.value">
+            </div>
+
+            <div class="control-card">
+                <h3>⚡ PLAYER ABILITIES</h3>
+                <label>WALK SPEED</p>
+                <input type="range" min="1" max="50" value="10">
+                
+                <label>JUMP POWER</p>
+                <input type="range" min="1" max="100" value="15">
+            </div>
         </div>
+
+        <button class="neon-btn-full">SYNC CHANGES TO SERVER</button>
+        <button class="neon-btn-full kill-switch">EMERGENCY KILL SWITCH (SHUTDOWN GAME)</button>
     </div>
 </body>
 </html>
