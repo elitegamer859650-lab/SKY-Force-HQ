@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GATEWAY | Paradox HQ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="secure-bg">
+    <div class="glass-box">
+        <h2 class="neon-red">IDENTITY HANDSHAKE</h2>
+        <p>Scanning Hardware DNA...</p>
+        <button onclick="verify_owner()" class="btn-glow">ACCESS KERNEL</button>
+    </div>
+
+    <script>
+        function verify_owner() {
+            // Aapki device ka exclusive data
+            const MASTER = {
+                cores: 2,
+                ram: 4,
+                screen: "1366x768"
+            };
+
+            const currentCores = navigator.hardwareConcurrency;
+            const currentRam = navigator.deviceMemory;
+            const currentScreen = window.screen.width + "x" + window.screen.height;
+
+            // Strict Validation
+            if(currentCores === MASTER.cores && currentRam === MASTER.ram && currentScreen === MASTER.screen) {
+                // Real Cookie Set Karo (Security Layer)
+                document.cookie = "p_token=verified_owner; max-age=3600; path=/; SameSite=Strict";
+                window.location.href = "challenge.html"; 
+            } else {
+                alert("CRITICAL SECURITY BREACH: UNAUTHORIZED DEVICE DETECTED.");
+                document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%;'>SYSTEM PERMANENTLY LOCKED.</h1>";
+            }
+        }
+    </script>
+</body>
+</html>
