@@ -1,57 +1,115 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    
     <title>DASHBOARD | Paradox HQ</title>
     <style>
-        body { background: #050505; color: white; font-family: 'Orbitron', sans-serif; display: flex; margin: 0; }
-        .sidebar { width: 250px; border-right: 1px solid #ff4500; height: 100vh; padding: 20px; }
-        .main { flex: 1; padding: 40px; }
-        .match-card { background: rgba(255,69,0,0.05); border: 1px solid #ff4500; padding: 20px; border-radius: 10px; margin: 10px; display: inline-block; width: 200px; }
+        body { background: #050505; color: white; font-family: 'Orbitron', sans-serif; display: flex; margin: 0; overflow: hidden; }
+        .sidebar { width: 250px; border-right: 2px solid #ff4500; height: 100vh; padding: 20px; background: #0a0a0a; }
+        .main { flex: 1; padding: 40px; background: linear-gradient(135deg, #050505 0%, #111 100%); }
+        .match-card { background: rgba(255,69,0,0.05); border: 1px solid #ff4500; padding: 20px; border-radius: 10px; margin: 10px; display: inline-block; width: 220px; box-shadow: 0 0 15px rgba(255,69,0,0.1); }
+        .match-card h3 { color: #ff4500; margin-top: 0; }
+        .match-card h2 { font-size: 32px; margin: 10px 0; }
+        hr { border: 0; border-top: 1px solid #333; margin: 20px 0; }
+        .btn-ban { padding: 10px 20px; background: #ff4500; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-ban:hover { background: #ff0000; box-shadow: 0 0 20px #ff0000; }
+        #alert-list div { padding: 5px; border-bottom: 1px solid #222; color: #ff8888; }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <h2 style="color:#ff4500">PARADOX<span>HQ</span></h2>
-        <p>OWNER: 2-CORE / 4GB RAM</p>
+        <h2 style="color:#ff4500">GHOST<span>PLAYS</span></h2>
+        <p style="font-size: 10px; color: #888;">OWNER: 2-CORE / 4GB RAM [cite: 2025-12-18]</p>
         <hr>
-        <p onclick="location.href='setting.html'" style="cursor:pointer">⚙️ SETTINGS</p>
+        <p onclick="location.href='setting.html'" style="cursor:pointer; color: #ccc;">⚙️ SETTINGS</p>
+        <p id="admin-status" style="color: red; font-size: 12px;">OFFLINE</p>
     </div>
+
     <div class="main">
         <h1>LIVE MONITOR</h1>
-        <div class="match-card"><h3>MATCH 01</h3><h2 id="m1-count">0/30</h2></div>
-        <div class="match-card"><h3>MATCH 02</h3><h2 id="m2-count">0/30</h2></div>
+        <div id="status-cards">
+            <div class="match-card"><h3>MATCH 01</h3><h2 id="m1-count">0/30</h2></div>
+            <div class="match-card"><h3>MATCH 02</h3><h2 id="m2-count">0/30</h2></div>
+        </div>
+
+        <div id="ghost-admin-panel" style="margin-top: 30px; border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.5);">
+            <h2 style="color:#ff4500; border-bottom: 1px solid #ff4500; padding-bottom: 10px;">MASTER CONTROL PANEL</h2>
+            <div style="display:flex; justify-content:space-between; margin-top: 20px;">
+                <div style="width:48%; background:#000; padding:15px; border-radius: 5px;">
+                    <h3 style="color:red; margin-top:0;">🚨 LIVE ALERTS</h3>
+                    <div id="alert-list" style="height:150px; overflow-y:auto;">Waiting for signals...</div>
+                </div>
+                <div style="width:48%; background:#000; padding:15px; border-radius: 5px;">
+                    <h3 style="color:#00ffff; margin-top:0;">👥 ACTIVE PLAYERS</h3>
+                    <div id="player-list" style="height:150px; overflow-y:auto;">No players online.</div>
+                </div>
+            </div>
+            <div style="margin-top:30px; text-align:center;">
+                <input id="target-uid-input" placeholder="Enter Hacker UID..." style="padding:12px; width:300px; background:#111; border:1px solid #ff4500; color:white; font-family:'Orbitron';">
+                <button onclick="masterBanAction()" class="btn-ban">PERMANENT BAN</button>
+            </div>
+        </div>
     </div>
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
     <script>
-        const socket = io("https://elitegamer859650-paradox-server-hq.hf.space");
-        socket.on("joined", (data) => {
-            document.getElementById(data.match === 'match_1' ? 'm1-count' : 'm2-count').innerText = data.count + "/30";
+        // Firebase Config [cite: 2025-12-18]
+        const firebaseConfig = {
+            apiKey: "AIzaSy...", // Apni API Key yahan dalain
+            databaseURL: "https://your-db.firebaseio.com",
+            projectId: "your-project-id",
+            authDomain: "your-app.firebaseapp.com"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // 🛡️ Security Check (Only Master UID) [cite: 2025-12-23]
+        const MASTER_UID = "qo9pEdaJxlepuswu7UTRwBFjXSA2";
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user && user.uid === MASTER_UID) {
+                document.getElementById('admin-status').innerText = "ONLINE - GHOST PLAYS";
+                document.getElementById('admin-status').style.color = "#00ff00";
+                startMasterSync();
+            } else {
+                alert("Unauthorized Access! Dashboard Locked.");
+            }
         });
+
+        function startMasterSync() {
+            // 📡 Match Monitoring [cite: 2025-12-18]
+            db.ref('live_matches').on('value', (snap) => {
+                let players = snap.val() || {};
+                let count = Object.keys(players).length;
+                document.getElementById('m1-count').innerText = count + "/30";
+                
+                // Active Player List Update
+                let listHTML = "";
+                for(let uid in players) {
+                    listHTML += `<div>👤 ${uid.substring(0,8)}... <span style="color:#444">| ACTIVE</span></div>`;
+                }
+                document.getElementById('player-list').innerHTML = listHTML;
+            });
+
+            // 🚨 Alert Monitoring [cite: 2025-12-23]
+            db.ref('alerts').on('child_added', (snap) => {
+                let alert = snap.val();
+                let alertFeed = document.getElementById('alert-list');
+                alertFeed.innerHTML = `<div style="background:rgba(255,0,0,0.1); margin-bottom:5px;">⚠️ ${alert.reason} | UID: ${snap.key.substring(0,6)}</div>` + alertFeed.innerHTML;
+            });
+        }
+
+        // 🚫 Master Ban Function [cite: 2025-12-18, 2025-12-23]
+        window.masterBanAction = function() {
+            let targetUID = document.getElementById('target-uid-input').value;
+            if(targetUID) {
+                db.ref('players/' + targetUID).update({ isBanned: true, banType: "PERMANENT" });
+                db.ref('live_matches/' + targetUID).remove();
+                alert("Hacker " + targetUID + " Banned Permanently! 🏁");
+            }
+        };
     </script>
-    <div id="ghost-admin-panel" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); width:80%; height:70%; background:rgba(0,0,0,0.9); border:2px solid #ff4500; color:white; z-index:10000; padding:20px; font-family:'Orbitron', sans-serif; overflow-y:auto;">
-    
-    <h1 style="text-align:center; color:#ff4500; text-shadow:0 0 10px #ff4500;">GHOST PLAYS CONTROL PANEL</h1>
-    
-    <div style="display:flex; justify-content:space-between;">
-        <div style="width:45%; background:#111; padding:10px; border:1px solid #444;">
-            <h3 style="color:red;">🚨 LIVE ALERTS</h3>
-            <div id="alert-list" style="height:200px; overflow-y:scroll; font-size:12px;">
-                </div>
-        </div>
-
-        <div style="width:45%; background:#111; padding:10px; border:1px solid #444;">
-            <h3 style="color:#00ffff;">👥 ACTIVE PLAYERS</h3>
-            <div id="player-list" style="height:200px; overflow-y:scroll; font-size:12px;">
-                </div>
-        </div>
-    </div>
-
-    <div style="margin-top:20px; text-align:center;">
-        <input id="target-uid-input" placeholder="Enter UID to Ban..." style="padding:10px; width:250px; background:#222; border:1px solid #ff4500; color:white;">
-        <button onclick="masterBanAction()" style="padding:10px 20px; background:#ff4500; color:white; border:none; cursor:pointer; font-weight:bold;">PERMANENT BAN</button>
-    </div>
-</div>
 </body>
 </html>
