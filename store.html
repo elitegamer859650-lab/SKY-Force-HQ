@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SKY FORCE - HQ STORE</title>
+    <style>
+        body { margin: 0; background: #050505; color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 30px; }
+        .item-card { background: #111; border: 1px solid #333; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; }
+        .item-card:hover { border-color: red; box-shadow: 0 0 15px rgba(255,0,0,0.3); }
+        .price-tag { color: gold; font-weight: bold; margin: 10px 0; }
+        .buy-btn { background: #ff0000; color: white; border: none; padding: 10px 20px; width: 100%; cursor: pointer; font-weight: bold; }
+        .buy-btn:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+
+    <h1 style="color: red; letter-spacing: 5px;">HQ STORE</h1>
+    <div id="store-container" class="store-grid">
+        <div style="color: #444;">Fetching items from HQ...</div>
+    </div>
+
+    <script type="module">
+        import { db } from './src/system-core.js';
+        import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+
+        const container = document.getElementById('store-container');
+
+        // Professional Sync from Dashboard [cite: 2025-12-18]
+        onValue(ref(db, 'server_control/store_items'), (snapshot) => {
+            container.innerHTML = '';
+            const items = snapshot.val();
+            
+            if (items) {
+                Object.keys(items).forEach(id => {
+                    const item = items[id];
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.innerHTML = `
+                        <h3 style="margin:0;">${item.name}</h3>
+                        <div class="price-tag">${item.cost} ${item.currency.toUpperCase()}</div>
+                        <button class="buy-btn" onclick="processPurchase('${id}', ${item.cost})">PURCHASE</button>
+                    `;
+                    container.appendChild(card);
+                });
+            } else {
+                container.innerHTML = "Store is currently empty. Waiting for HQ Upload.";
+            }
+        });
+
+        window.processPurchase = (itemID, cost) => {
+            // Purchase logic connecting to Player's Balance [cite: 2025-12-18]
+            alert("Contacting HQ for transaction...");
+        };
+    </script>
+</body>
+</html>
