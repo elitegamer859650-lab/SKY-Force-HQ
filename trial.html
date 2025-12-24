@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SKY FORCE - TRIAL CONTROL</title>
+    <style>
+        body { background: #000; color: #ff0000; font-family: 'Courier New', monospace; padding: 40px; text-align: center; }
+        .box { border: 2px solid #333; padding: 30px; display: inline-block; background: #0a0a0a; border-radius: 15px; width: 400px; }
+        input { width: 90%; padding: 10px; margin: 10px 0; background: #111; border: 1px solid #444; color: cyan; }
+        .deploy-btn { background: red; color: white; border: none; padding: 15px; width: 95%; cursor: pointer; font-weight: bold; font-size: 18px; margin-top: 20px; }
+        .deploy-btn:hover { box-shadow: 0 0 30px red; }
+        #status { color: #888; font-size: 12px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <h1>7-DAY TRIAL COMMAND</h1>
+    <div class="box">
+        <p style="color: white;">Upload Bundle for ALL Players</p>
+        <input type="text" id="bundle-id" placeholder="Bundle ID (e.g. safari_v1)">
+        <input type="text" id="bundle-name" placeholder="Bundle Name (e.g. Safari Bundle)">
+        <input type="text" id="bundle-url" placeholder="GLB File URL">
+        
+        <button class="deploy-btn" onclick="triggerGlobalTrial()">DEPLOY TO ALL PLAYERS ⚡</button>
+        <div id="status">Standby...</div>
+    </div>
+
+    <script type="module">
+        import { db } from './src/system-core.js';
+        import { ref, get, update } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+
+        window.triggerGlobalTrial = async () => {
+            const id = document.getElementById('bundle-id').value;
+            const name = document.getElementById('bundle-name').value;
+            const url = document.getElementById('bundle-url').value;
+            const status = document.getElementById('status');
+
+            if(!id || !url) { alert("Missing Data!"); return; }
+
+            status.innerText = "ACCESSING PLAYER DATABASE...";
+            
+            // 1. Get all players from Firebase [cite: 2025-12-18]
+            const playersRef = ref(db, 'players');
+            const snapshot = await get(playersRef);
+
+            if (snapshot.exists()) {
+                const updates = {};
+                const currentTime = Date.now();
+
+                snapshot.forEach((player) => {
+                    const uid = player.key;
+                    
+                    // 2. Add to Trial Inventory [cite: 2025-12-24]
+                    updates[`players/${uid}/inventory/trial_items/${id}`] = {
+                        name: name,
+                        asset: url,
+                        activatedAt: currentTime,
+                        isTrial: true
+                    };
+
+                    // 3. Send to Mailbox for notification
+                    updates[`players/${uid}/mailbox/${id}_trial`] = {
+                        title: "FREE TRIAL ACTIVATED!",
+                        message: `Enjoy ${name} for 7 days! Permanent version available in store.`,
+                        itemID: id,
+                        timestamp: currentTime
+                    };
+                });
+
+                // 4. Dhayeen! Push to all accounts at once
+                await update(ref(db), updates);
+                status.innerText = "SUCCESS: 7-Day Trial sent to " + snapshot.size + " players!";
+                console.log("Global Trial Deployed Successfully.");
+            }
+        };
+    </script>
+</body>
+</html>
